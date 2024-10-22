@@ -32,8 +32,8 @@ final class AIModelRetrieverTests: XCTestCase {
         let models = retriever.anthropic()
         
         XCTAssertFalse(models.isEmpty)
-        XCTAssertTrue(models.contains { $0.id == "claude-3-5-sonnet-20240620" })
-        XCTAssertTrue(models.contains { $0.name == "Claude 3.5 Sonnet" })
+        XCTAssertTrue(models.contains { $0.id == "claude-3-5-sonnet-latest" })
+        XCTAssertTrue(models.contains { $0.name == "Claude 3.5 Sonnet (Latest)" })
     }
     
     func testGoogle() {
