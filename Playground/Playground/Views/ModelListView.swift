@@ -38,6 +38,8 @@ struct ModelListView: View {
                 switch provider {
                 case .anthropic:
                     models = retriever.anthropic()
+                case .cohere:
+                    models = try await retriever.cohere(apiKey: viewModel.cohereAPIKey)
                 case .google:
                     models = retriever.google()
                 case .ollama:

@@ -58,6 +58,37 @@ public extension AIModelRetriever {
     }
 }
 
+// MARK: - Cohere
+public extension AIModelRetriever {
+    /// Retrieves a list of AI models from Cohere.
+    ///
+    /// - Parameters:
+    ///   - apiKey: The API key for authenticating with the API.
+    ///
+    /// - Returns: An array of ``AIModel`` that represents Cohere's available models.
+    ///
+    /// - Throws: An error if the network request fails or if the response cannot be decoded.
+    func cohere(apiKey: String) async throws -> [AIModel] {
+        guard let defaultEndpoint = URL(string: "https://api.cohere.com/v1/models?page_size=1000") else { return [] }
+        
+        let allHeaders = ["Authorization": "Bearer \(apiKey)"]
+        
+        let request = createRequest(for: defaultEndpoint, with: allHeaders)
+        let response: CohereResponse = try await performRequest(request)
+        
+        return response.models.map { AIModel(id: $0.name, name: $0.name) }
+    }
+    
+    private struct CohereResponse: Decodable {
+        let models: [CohereModel]
+    }
+    
+    private struct CohereModel: Decodable {
+        let name: String
+    }
+}
+
+// MARK: - Google
 public extension AIModelRetriever {
     /// Retrieves a list of AI models from Google.
     ///

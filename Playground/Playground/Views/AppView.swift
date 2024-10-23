@@ -9,10 +9,11 @@ import SwiftUI
 
 enum AIProvider: String, CaseIterable {
     case anthropic = "Anthropic"
+    case cohere = "Cohere"
     case google = "Google"
     case ollama = "Ollama"
     case openai = "OpenAI"
-    case groq = "Groq (OpenAI-compatible)"
+    case groq = "OpenAI-Compatible (Groq)"
 }
 
 struct AppView: View {
@@ -25,8 +26,9 @@ struct AppView: View {
                 NavigationLink(provider.rawValue) {
                     ModelListView(title: provider.rawValue, provider: provider)
                 }
-                .disabled(provider == .openai && viewModel.openaiAPIKey.isEmpty)
+                .disabled(provider == .cohere && viewModel.cohereAPIKey.isEmpty)
                 .disabled(provider == .groq && viewModel.groqAPIKey.isEmpty)
+                .disabled(provider == .openai && viewModel.openaiAPIKey.isEmpty)
             }
             .navigationTitle("Playground")
             .navigationBarTitleDisplayMode(.inline)

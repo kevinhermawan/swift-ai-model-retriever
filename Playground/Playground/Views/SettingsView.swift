@@ -16,11 +16,15 @@ struct SettingsView: View {
         
         NavigationStack {
             Form {
-                Section("OpenAI API Key") {
+                Section("Cohere") {
+                    TextField("API Key", text: $viewModelBindable.cohereAPIKey)
+                }
+                
+                Section("OpenAI") {
                     TextField("API Key", text: $viewModelBindable.openaiAPIKey)
                 }
                 
-                Section("Groq API Key (OpenAI-compatible)") {
+                Section("OpenAI-Compatible (Groq)") {
                     TextField("API Key", text: $viewModelBindable.groqAPIKey)
                 }
             }

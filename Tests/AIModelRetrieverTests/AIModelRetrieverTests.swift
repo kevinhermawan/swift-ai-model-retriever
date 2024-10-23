@@ -36,6 +36,25 @@ final class AIModelRetrieverTests: XCTestCase {
         XCTAssertTrue(models.contains { $0.name == "Claude 3.5 Sonnet (Latest)" })
     }
     
+    func testCohere() async throws {
+        let mockResponseString = """
+        {
+            "models": [
+                {"name": "test-model-1"},
+                {"name": "test-model-2"}
+            ]
+        }
+        """
+        
+        URLProtocolMock.mockData = mockResponseString.data(using: .utf8)
+        
+        let models = try await retriever.cohere(apiKey: "test-key")
+        
+        XCTAssertEqual(models.count, 2)
+        XCTAssertEqual(models[0].id, "test-model-1")
+        XCTAssertEqual(models[1].name, "test-model-2")
+    }
+    
     func testGoogle() {
         let models = retriever.google()
         
