@@ -1,3 +1,7 @@
+# 1.0.2
+
+- feat: adds new provider (Cohere) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/3
+
 # 1.0.1
 
 - chore: adds SPI badges by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/1
