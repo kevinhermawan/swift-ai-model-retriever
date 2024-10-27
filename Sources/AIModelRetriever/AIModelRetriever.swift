@@ -11,7 +11,7 @@ import FoundationNetworking
 #endif
 
 /// A struct that retrieves AI models from various providers.
-public struct AIModelRetriever {
+public struct AIModelRetriever: Sendable {
     /// Initializes a new instance of ``AIModelRetriever``.
     public init() {}
     

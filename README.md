@@ -59,6 +59,16 @@ for model in models {
 
 > Note: The Anthropic models are hardcoded. They do not require an API call to retrieve.
 
+### Retrieving Cohere Models
+
+```swift
+let models = modelRetriever.cohere(apiKey: "your-cohere-api-key")
+
+for model in models {
+    print("Model ID: \(model.id), Name: \(model.name)")
+}
+```
+
 ### Retrieving Google Models
 
 ```swift

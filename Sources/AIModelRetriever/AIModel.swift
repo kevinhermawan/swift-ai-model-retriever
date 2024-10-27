@@ -8,7 +8,7 @@
 import Foundation
 
 /// A struct that represents an AI model.
-public struct AIModel: Identifiable {
+public struct AIModel: Identifiable, Sendable {
     /// The unique identifier of the model.
     public let id: String
     
