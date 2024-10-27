@@ -23,11 +23,12 @@ final class URLProtocolMock: URLProtocol {
         if let error = URLProtocolMock.mockError {
             client?.urlProtocol(self, didFailWithError: error)
             client?.urlProtocolDidFinishLoading(self)
+            
             return
         }
         
-        if let data = URLProtocolMock.mockData {
-            client?.urlProtocol(self, didReceive: HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!, cacheStoragePolicy: .notAllowed)
+        if let data = URLProtocolMock.mockData, let url = request.url, let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
             client?.urlProtocol(self, didLoad: data)
             client?.urlProtocolDidFinishLoading(self)
             
