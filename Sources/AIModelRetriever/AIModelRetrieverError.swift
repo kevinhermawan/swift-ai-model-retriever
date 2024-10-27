@@ -8,7 +8,7 @@
 import Foundation
 
 /// An enum that represents errors that can occur during AI model retrieval.
-public enum AIModelRetrieverError: Error {
+public enum AIModelRetrieverError: Error, Sendable {
     /// Indicates that the server response was not in the expected format.
     case badServerResponse
     
