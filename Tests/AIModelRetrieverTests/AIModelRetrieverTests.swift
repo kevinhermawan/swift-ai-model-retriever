@@ -14,8 +14,8 @@ final class AIModelRetrieverTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        retriever = AIModelRetriever()
         URLProtocol.registerClass(URLProtocolMock.self)
+        retriever = AIModelRetriever()
     }
     
     override func tearDown() {
@@ -23,7 +23,6 @@ final class AIModelRetrieverTests: XCTestCase {
         URLProtocol.unregisterClass(URLProtocolMock.self)
         URLProtocolMock.mockData = nil
         URLProtocolMock.mockError = nil
-        URLProtocolMock.mockStatusCode = 200
         
         super.tearDown()
     }
@@ -120,35 +119,53 @@ final class AIModelRetrieverTests: XCTestCase {
         XCTAssertEqual(models[0].id, "custom-model-1")
         XCTAssertEqual(models[1].id, "custom-model-2")
     }
-    
-    func testServerError() async {
-        let errorResponse = """
+}
+
+// MARK: - Error Handling
+extension AIModelRetrieverTests {
+    func testServerError() async throws {
+        let mockErrorResponse = """
         {
-            "error": "Invalid API key"
+            "error": {
+                "message": "Invalid API key provided"
+            }
         }
         """
         
-        URLProtocolMock.mockData = errorResponse.data(using: .utf8)
-        URLProtocolMock.mockStatusCode = 401
+        URLProtocolMock.mockData = mockErrorResponse.data(using: .utf8)
         
         do {
-            _ = try await retriever.openAI(apiKey: "invalid-key")
-            XCTFail("Expected an error to be thrown")
+            let _ = try await retriever.openAI(apiKey: "test-key")
+
+            XCTFail("Expected serverError to be thrown")
         } catch let error as AIModelRetrieverError {
             switch error {
-            case .serverError(let statusCode, let errorMessage):
-                XCTAssertEqual(statusCode, 401)
-                
-                if let errorData = errorMessage?.data(using: .utf8),
-                   let jsonObject = try? JSONSerialization.jsonObject(with: errorData, options: []) as? [String: Any],
-                   let errorString = jsonObject["error"] as? String {
-                    XCTAssertEqual(errorString, "Invalid API key")
-                }
+            case .serverError(let message):
+                XCTAssertEqual(message, "Invalid API key provided")
             default:
-                XCTFail("Unexpected error type")
+                XCTFail("Expected serverError but got \(error)")
             }
-        } catch {
-            XCTFail("Unexpected error type")
+        }
+    }
+    
+    func testNetworkError() async throws {
+        URLProtocolMock.mockError = NSError(
+            domain: NSURLErrorDomain,
+            code: NSURLErrorNotConnectedToInternet,
+            userInfo: [NSLocalizedDescriptionKey: "The Internet connection appears to be offline."]
+        )
+        
+        do {
+            let _ = try await retriever.openAI(apiKey: "test-key")
+
+            XCTFail("Expected networkError to be thrown")
+        } catch let error as AIModelRetrieverError {
+            switch error {
+            case .networkError(let underlyingError):
+                XCTAssertEqual((underlyingError as NSError).code, NSURLErrorNotConnectedToInternet)
+            default:
+                XCTFail("Expected networkError but got \(error)")
+            }
         }
     }
 }

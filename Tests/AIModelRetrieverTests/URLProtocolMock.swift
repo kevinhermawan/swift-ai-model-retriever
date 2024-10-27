@@ -10,7 +10,6 @@ import Foundation
 final class URLProtocolMock: URLProtocol {
     static var mockData: Data?
     static var mockError: Error?
-    static var mockStatusCode: Int = 200
     
     override class func canInit(with request: URLRequest) -> Bool {
         return true
@@ -23,16 +22,20 @@ final class URLProtocolMock: URLProtocol {
     override func startLoading() {
         if let error = URLProtocolMock.mockError {
             client?.urlProtocol(self, didFailWithError: error)
-        } else {
-            if let data = URLProtocolMock.mockData {
-                client?.urlProtocol(self, didLoad: data)
-            }
+            client?.urlProtocolDidFinishLoading(self)
             
-            let response = HTTPURLResponse(url: request.url!, statusCode: URLProtocolMock.mockStatusCode, httpVersion: nil, headerFields: nil)!
-            
-            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            return
         }
         
+        if let data = URLProtocolMock.mockData, let url = request.url, let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil) {
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+            
+            return
+        }
+        
+        client?.urlProtocol(self, didFailWithError: NSError(domain: "No mock data", code: -1, userInfo: nil))
         client?.urlProtocolDidFinishLoading(self)
     }
     
