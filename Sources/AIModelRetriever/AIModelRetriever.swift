@@ -15,18 +15,33 @@ public struct AIModelRetriever: Sendable {
     /// Initializes a new instance of ``AIModelRetriever``.
     public init() {}
     
-    private func performRequest<T: Decodable>(_ request: URLRequest) async throws -> T {
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse else {
-            throw AIModelRetrieverError.badServerResponse
+    private func performRequest<T: Decodable, E: ProviderError>(_ request: URLRequest, errorType: E.Type) async throws -> T {
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            if let errorResponse = try? JSONDecoder().decode(E.self, from: data) {
+                throw AIModelRetrieverError.serverError(errorResponse.errorMessage)
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
+                throw AIModelRetrieverError.badServerResponse
+            }
+            
+            let models = try JSONDecoder().decode(T.self, from: data)
+            
+            return models
+        } catch let error as AIModelRetrieverError {
+            throw error
+        } catch let error as URLError {
+            switch error.code {
+            case .cancelled:
+                throw AIModelRetrieverError.cancelled
+            default:
+                throw AIModelRetrieverError.networkError(error)
+            }
+        } catch {
+            throw AIModelRetrieverError.networkError(error)
         }
-        
-        guard 200...299 ~= httpResponse.statusCode else {
-            throw AIModelRetrieverError.serverError(statusCode: httpResponse.statusCode, error: String(data: data, encoding: .utf8))
-        }
-        
-        return try JSONDecoder().decode(T.self, from: data)
     }
     
     private func createRequest(for endpoint: URL, with headers: [String: String]? = nil) -> URLRequest {
@@ -74,7 +89,7 @@ public extension AIModelRetriever {
         let allHeaders = ["Authorization": "Bearer \(apiKey)"]
         
         let request = createRequest(for: defaultEndpoint, with: allHeaders)
-        let response: CohereResponse = try await performRequest(request)
+        let response: CohereResponse = try await performRequest(request, errorType: CohereError.self)
         
         return response.models.map { AIModel(id: $0.name, name: $0.name) }
     }
@@ -85,6 +100,12 @@ public extension AIModelRetriever {
     
     private struct CohereModel: Decodable {
         let name: String
+    }
+    
+    private struct CohereError: ProviderError {
+        let message: String
+        
+        var errorMessage: String { message }
     }
 }
 
@@ -122,7 +143,7 @@ public extension AIModelRetriever {
         guard let defaultEndpoint = URL(string: "http://localhost:11434/api/tags") else { return [] }
         
         let request = createRequest(for: endpoint ?? defaultEndpoint, with: headers)
-        let response: OllamaResponse = try await performRequest(request)
+        let response: OllamaResponse = try await performRequest(request, errorType: OllamaError.self)
         
         return response.models.map { AIModel(id: $0.model, name: $0.name) }
     }
@@ -134,6 +155,16 @@ public extension AIModelRetriever {
     private struct OllamaModel: Decodable {
         let name: String
         let model: String
+    }
+    
+    private struct OllamaError: ProviderError {
+        let error: Error
+        
+        struct Error: Decodable {
+            let message: String
+        }
+        
+        var errorMessage: String { error.message }
     }
 }
 
@@ -156,7 +187,7 @@ public extension AIModelRetriever {
         allHeaders["Authorization"] = "Bearer \(apiKey)"
         
         let request = createRequest(for: endpoint ?? defaultEndpoint, with: allHeaders)
-        let response: OpenAIResponse = try await performRequest(request)
+        let response: OpenAIResponse = try await performRequest(request, errorType: OpenAIError.self)
         
         return response.data.map { AIModel(id: $0.id, name: $0.id) }
     }
@@ -167,5 +198,22 @@ public extension AIModelRetriever {
     
     private struct OpenAIModel: Decodable {
         let id: String
+    }
+    
+    private struct OpenAIError: ProviderError {
+        let error: Error
+        
+        struct Error: Decodable {
+            let message: String
+        }
+        
+        var errorMessage: String { error.message }
+    }
+}
+
+// MARK: - Supporting Types
+private extension AIModelRetriever {
+    protocol ProviderError: Decodable {
+        var errorMessage: String { get }
     }
 }

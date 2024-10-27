@@ -103,22 +103,25 @@ do {
 
 ### Error Handling
 
-The package uses ``AIModelRetrieverError`` to represent specific errors that may occur. You can catch and handle these errors as follows:
+``AIModelRetrieverError`` provides structured error handling through the ``AIModelRetrieverError`` enum. This enum contains three cases that represent different types of errors you might encounter:
 
 ```swift
-let apiKey = "your-openai-api-key"
-
 do {
-    let models = try await modelRetriever.openai(apiKey: apiKey)
-    // Process models
-} catch let error as AIModelRetrieverError {
+    let models = try await modelRetriever.openai(apiKey: "your-api-key")
+} catch let error as LLMChatOpenAIError {
     switch error {
+    case .serverError(let message):
+        // Handle server-side errors (e.g., invalid API key, rate limits)
+        print("Server Error: \(message)")
+    case .networkError(let error):
+        // Handle network-related errors (e.g., no internet connection)
+        print("Network Error: \(error.localizedDescription)")
     case .badServerResponse:
-        print("Received an invalid response from the server")
-    case .serverError(let statusCode, let errorMessage):
-        print("Server error (status \(statusCode)): \(errorMessage ?? "No error message provided")")
+        // Handle invalid server responses
+        print("Invalid response received from server")
+    case .cancelled:
+        // Handle cancelled requests
+        print("Request cancelled")
     }
-} catch {
-    print("An unexpected error occurred: \(error)")
 }
 ```
