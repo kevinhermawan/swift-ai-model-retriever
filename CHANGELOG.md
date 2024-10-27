@@ -1,3 +1,8 @@
+# 1.0.3
+
+- feat: conforms to `Sendable` by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/4
+- improve: adds better error handling by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/5
+
 # 1.0.2
 
 - feat: adds new provider (Cohere) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/3
