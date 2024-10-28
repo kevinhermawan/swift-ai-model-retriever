@@ -24,21 +24,18 @@ public struct AIModelRetriever: Sendable {
             }
             
             guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
-                throw AIModelRetrieverError.badServerResponse
+                throw AIModelRetrieverError.serverError(response.description)
             }
             
-            let models = try JSONDecoder().decode(T.self, from: data)
-            
-            return models
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch is CancellationError {
+            throw AIModelRetrieverError.cancelled
+        } catch let error as URLError where error.code == .cancelled {
+            throw AIModelRetrieverError.cancelled
+        } catch let error as DecodingError {
+            throw AIModelRetrieverError.decodingError(error)
         } catch let error as AIModelRetrieverError {
             throw error
-        } catch let error as URLError {
-            switch error.code {
-            case .cancelled:
-                throw AIModelRetrieverError.cancelled
-            default:
-                throw AIModelRetrieverError.networkError(error)
-            }
         } catch {
             throw AIModelRetrieverError.networkError(error)
         }
@@ -78,11 +75,11 @@ public extension AIModelRetriever {
     /// Retrieves a list of AI models from Cohere.
     ///
     /// - Parameters:
-    ///   - apiKey: The API key for authenticating with the API.
+    ///   - apiKey: The API key that authenticates with the API.
     ///
     /// - Returns: An array of ``AIModel`` that represents Cohere's available models.
     ///
-    /// - Throws: An error if the network request fails or if the response cannot be decoded.
+    /// - Throws: An error that occurs if the request is cancelled, if the network request fails, if the server returns an error, or if the response cannot be decoded.
     func cohere(apiKey: String) async throws -> [AIModel] {
         guard let defaultEndpoint = URL(string: "https://api.cohere.com/v1/models?page_size=1000") else { return [] }
         
@@ -138,7 +135,7 @@ public extension AIModelRetriever {
     ///
     /// - Returns: An array of ``AIModel`` that represents Ollama's available models.
     ///
-    /// - Throws: An error if the network request fails or if the response cannot be decoded.
+    /// - Throws: An error that occurs if the request is cancelled, if the network request fails, if the server returns an error, or if the response cannot be decoded.
     func ollama(endpoint: URL? = nil, headers: [String: String]? = nil) async throws -> [AIModel] {
         guard let defaultEndpoint = URL(string: "http://localhost:11434/api/tags") else { return [] }
         
@@ -173,13 +170,13 @@ public extension AIModelRetriever {
     /// Retrieves a list of AI models from OpenAI or OpenAI-compatible APIs.
     ///
     /// - Parameters:
-    ///   - apiKey: The API key for authenticating with the API.
+    ///   - apiKey: The API key that authenticates with the API.
     ///   - endpoint: The URL endpoint for the API. If not provided, it defaults to "https://api.openai.com/v1/models".
     ///   - headers: Optional dictionary of additional HTTP headers to include in the request.
     ///
     /// - Returns: An array of ``AIModel`` that represents the available models from the specified API.
     ///
-    /// - Throws: An error if the network request fails or if the response cannot be decoded.
+    /// - Throws: An error that occurs if the request is cancelled, if the network request fails, if the server returns an error, or if the response cannot be decoded.
     func openAI(apiKey: String, endpoint: URL? = nil, headers: [String: String]? = nil) async throws -> [AIModel] {
         guard let defaultEndpoint = URL(string: "https://api.openai.com/v1/models") else { return [] }
         
