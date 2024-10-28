@@ -57,7 +57,8 @@ for model in models {
 }
 ```
 
-> Note: The Anthropic models are hardcoded. They do not require an API call to retrieve.
+> [!NOTE]
+> The Anthropic models are hardcoded. They do not require an API call to retrieve.
 
 ### Retrieving Cohere Models
 
@@ -79,7 +80,8 @@ for model in models {
 }
 ```
 
-> Note: The Google models are hardcoded. They do not require an API call to retrieve.
+> [!NOTE]
+> The Google models are hardcoded. They do not require an API call to retrieve.
 
 ### Retrieving Ollama Models
 
@@ -98,10 +100,8 @@ do {
 ### Retrieving OpenAI Models
 
 ```swift
-let apiKey = "your-openai-api-key"
-
 do {
-    let models = try await retriever.openAI(apiKey: apiKey)
+    let models = try await retriever.openAI(apiKey: "your-openai-api-key")
 
     for model in models {
         print("Model ID: \(model.id), Name: \(model.name)")
@@ -116,11 +116,10 @@ do {
 The `openAI(apiKey:endpoint:headers:)` method can also be used with OpenAI-compatible APIs by specifying a custom endpoint:
 
 ```swift
-let apiKey = "your-api-key"
 let customEndpoint = URL(string: "https://api.your-openai-compatible-service.com/v1/models")!
 
 do {
-    let models = try await modelRetriever.openAI(apiKey: apiKey, endpoint: customEndpoint)
+    let models = try await modelRetriever.openAI(apiKey: "your-api-key", endpoint: customEndpoint)
 
     for model in models {
         print("Model ID: \(model.id), Name: \(model.name)")
@@ -132,34 +131,12 @@ do {
 
 ### Error Handling
 
-The package uses `AIModelRetrieverError` to represent specific errors that may occur. You can catch and handle these errors as follows:
+`AIModelRetrieverError` provides structured error handling through the `AIModelRetrieverError` enum. This enum contains several cases that represent different types of errors you might encounter:
 
 ```swift
-let apiKey = "your-openai-api-key"
-
 do {
-    let models = try await modelRetriever.openai(apiKey: apiKey)
-    // Process models
+    let models = try await modelRetriever.openAI(apiKey: "your-api-key")
 } catch let error as AIModelRetrieverError {
-    switch error {
-    case .badServerResponse:
-        print("Received an invalid response from the server")
-    case .serverError(let statusCode, let errorMessage):
-        print("Server error (status \(statusCode)): \(errorMessage ?? "No error message provided")")
-    }
-} catch {
-    print("An unexpected error occurred: \(error)")
-}
-```
-
-### Error Handling
-
-`AIModelRetrieverError` provides structured error handling through the `AIModelRetrieverError` enum. This enum contains three cases that represent different types of errors you might encounter:
-
-```swift
-do {
-    let models = try await modelRetriever.openai(apiKey: "your-api-key")
-} catch let error as LLMChatOpenAIError {
     switch error {
     case .serverError(let message):
         // Handle server-side errors (e.g., invalid API key, rate limits)
@@ -167,13 +144,16 @@ do {
     case .networkError(let error):
         // Handle network-related errors (e.g., no internet connection)
         print("Network Error: \(error.localizedDescription)")
-    case .badServerResponse:
-        // Handle invalid server responses
-        print("Invalid response received from server")
+    case .decodingError(let error):
+        // Handle errors that occur when the response cannot be decoded
+        print("Decoding Error: \(error)")
     case .cancelled:
-        // Handle cancelled requests
-        print("Request cancelled")
+        // Handle requests that are cancelled
+        print("Request was cancelled")
     }
+} catch {
+    // Handle any other errors
+    print("An unexpected error occurred: \(error)")
 }
 ```
 
