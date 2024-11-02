@@ -1,3 +1,7 @@
+# 1.2.0
+
+- refactor: adds `statusCode` to `serverError` by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/7
+
 # 1.1.0
 
 - improve: handles decoding error by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/6
