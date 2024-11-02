@@ -14,8 +14,8 @@ final class AIModelRetrieverTests: XCTestCase {
     override func setUp() {
         super.setUp()
         
-        URLProtocol.registerClass(URLProtocolMock.self)
         retriever = AIModelRetriever()
+        URLProtocol.registerClass(URLProtocolMock.self)
     }
     
     override func tearDown() {
@@ -155,7 +155,8 @@ extension AIModelRetrieverTests {
             XCTFail("Expected serverError to be thrown")
         } catch let error as AIModelRetrieverError {
             switch error {
-            case .serverError(let message):
+            case .serverError(let statusCode, let message):
+                XCTAssertEqual(statusCode, 401)
                 XCTAssertEqual(message, "Invalid API key provided")
             default:
                 XCTFail("Expected serverError but got \(error)")
@@ -182,7 +183,8 @@ extension AIModelRetrieverTests {
             XCTFail("Expected serverError to be thrown")
         } catch let error as AIModelRetrieverError {
             switch error {
-            case .serverError(let message):
+            case .serverError(let statusCode, let message):
+                XCTAssertEqual(statusCode, 200)
                 XCTAssertEqual(message, "An error occurred")
             default:
                 XCTFail("Expected serverError but got \(error)")

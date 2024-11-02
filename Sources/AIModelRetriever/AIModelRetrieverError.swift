@@ -7,35 +7,25 @@
 
 import Foundation
 
-/// An enum that represents errors that can occur during AI model retrieval.
+/// An enum that represents errors that can occur during model retrieval.
 public enum AIModelRetrieverError: Error, Sendable {
-    /// A case that represents a server-side error response.
+    /// An error that occurs during JSON decoding.
     ///
-    /// - Parameter message: The error message from the server.
-    case serverError(String)
+    /// - Parameter error: The underlying decoding error.
+    case decodingError(Error)
     
-    /// A case that represents a network-related error.
+    /// An error that occurs during network operations.
     ///
     /// - Parameter error: The underlying network error.
     case networkError(Error)
     
-    /// A case that represents a decoding error.
-    case decodingError(Error)
+    /// An error returned by the server.
+    ///
+    /// - Parameters:
+    ///   - statusCode: The HTTP status code returned by the server.
+    ///   - message: The error message received from the server.
+    case serverError(statusCode: Int, message: String)
     
-    /// A case that represents a request has been canceled.
+    /// An error that occurs when the request is cancelled.
     case cancelled
-    
-    /// A localized message that describes the error.
-    public var errorDescription: String? {
-        switch self {
-        case .serverError(let error):
-            return error
-        case .networkError(let error):
-            return error.localizedDescription
-        case .decodingError(let error):
-            return error.localizedDescription
-        case .cancelled:
-            return "Request was cancelled"
-        }
-    }
 }
