@@ -19,12 +19,17 @@ public struct AIModelRetriever: Sendable {
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             
+            guard let httpResponse = response as? HTTPURLResponse else {
+                throw AIModelRetrieverError.serverError(statusCode: 0, message: response.description)
+            }
+            
+            // Check for API errors first, as they might come with 200 status
             if let errorResponse = try? JSONDecoder().decode(E.self, from: data) {
-                throw AIModelRetrieverError.serverError(errorResponse.errorMessage)
+                throw AIModelRetrieverError.serverError(statusCode: httpResponse.statusCode, message: errorResponse.errorMessage)
             }
             
             guard let httpResponse = response as? HTTPURLResponse, 200...299 ~= httpResponse.statusCode else {
-                throw AIModelRetrieverError.serverError(response.description)
+                throw AIModelRetrieverError.serverError(statusCode: httpResponse.statusCode, message: response.description)
             }
             
             return try JSONDecoder().decode(T.self, from: data)

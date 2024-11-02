@@ -107,9 +107,9 @@ do {
     let models = try await modelRetriever.openAI(apiKey: "your-api-key")
 } catch let error as AIModelRetrieverError {
     switch error {
-    case .serverError(let message):
+    case .serverError(let statusCode, let message):
         // Handle server-side errors (e.g., invalid API key, rate limits)
-        print("Server Error: \(message)")
+        print("Server Error [\(statusCode)]: \(message)")
     case .networkError(let error):
         // Handle network-related errors (e.g., no internet connection)
         print("Network Error: \(error.localizedDescription)")
