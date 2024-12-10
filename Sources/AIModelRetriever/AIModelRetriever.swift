@@ -117,17 +117,16 @@ public extension AIModelRetriever {
 public extension AIModelRetriever {
     /// Retrieves a list of AI models from Google.
     ///
-    /// This method returns a predefined list of Google's AI models.
+    /// The list of available models is sourced from Google's official documentation:
+    /// [Google Models Documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models)
     ///
     /// - Returns: An array of ``AIModel`` that represents Google's available models.
     func google() -> [AIModel] {
         return [
             AIModel(id: "gemini-1.5-flash", name: "Gemini 1.5 Flash"),
-            AIModel(id: "gemini-1.5-flash-8b", name: "Gemini 1.5 Flash-8B"),
             AIModel(id: "gemini-1.5-pro", name: "Gemini 1.5 Pro"),
             AIModel(id: "gemini-1.0-pro", name: "Gemini 1.0 Pro"),
-            AIModel(id: "text-embedding-004", name: "Text Embedding"),
-            AIModel(id: "aqa", name: "AQA")
+            AIModel(id: "gemini-1.0-pro-vision", name: "Gemini 1.0 Pro Vision")
         ]
     }
 }
