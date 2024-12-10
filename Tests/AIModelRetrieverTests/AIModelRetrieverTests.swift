@@ -34,7 +34,7 @@ final class AIModelRetrieverTests: XCTestCase {
         
         XCTAssertFalse(models.isEmpty)
         XCTAssertTrue(models.contains { $0.id == "claude-3-5-sonnet-latest" })
-        XCTAssertTrue(models.contains { $0.name == "Claude 3.5 Sonnet (Latest)" })
+        XCTAssertTrue(models.contains { $0.name == "Claude 3.5 Sonnet" })
     }
     
     /// Tests that the `cohere` method successfully retrieves models
