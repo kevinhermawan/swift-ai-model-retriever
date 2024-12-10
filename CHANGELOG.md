@@ -1,3 +1,8 @@
+# 1.2.1
+
+- feat: adds new Anthropic model (`claude-3-5-haiku`) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/8
+- feat: adds new Google model (`gemini-1.0-pro-vision`) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/9
+
 # 1.2.0
 
 - refactor: adds `statusCode` to `serverError` by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/7
