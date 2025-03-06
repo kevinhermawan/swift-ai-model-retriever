@@ -68,11 +68,10 @@ public extension AIModelRetriever {
     /// - Returns: An array of ``AIModel`` that represents Anthropic's available models.
     func anthropic() -> [AIModel] {
         return [
+            AIModel(id: "claude-3-7-sonnet-latest", name: "Claude 3.7 Sonnet"),
             AIModel(id: "claude-3-5-sonnet-latest", name: "Claude 3.5 Sonnet"),
             AIModel(id: "claude-3-5-haiku-latest", name: "Claude 3.5 Haiku"),
-            AIModel(id: "claude-3-opus-latest", name: "Claude 3 Opus (Latest)"),
-            AIModel(id: "claude-3-sonnet-20240229", name: "Claude 3 Sonnet"),
-            AIModel(id: "claude-3-haiku-20240307", name: "Claude 3 Haiku")
+            AIModel(id: "claude-3-opus-latest", name: "Claude 3 Opus (Latest)")
         ]
     }
 }
