@@ -1,3 +1,8 @@
+# 1.2.2
+
+- feat: adds new Anthropic model (`claude-3-7-sonnet`) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/10
+- feat: adds new Google models (`gemini-2.0-*`) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/11
+
 # 1.2.1
 
 - feat: adds new Anthropic model (`claude-3-5-haiku`) by @kevinhermawan in https://github.com/kevinhermawan/swift-ai-model-retriever/pull/8
